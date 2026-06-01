@@ -46,12 +46,17 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .p-colors{margin-top:6px;font-size:12px;color:#666;background:#f8f8f8;padding:6px 10px;border-radius:6px;line-height:1.6;}
 .p-colors .label{color:#999;}
 .product-card{position:relative;}
-.product-image-wrap{width:100%;max-height:200px;overflow:hidden;border-radius:8px;margin-bottom:8px;background:#f8f8f8;}
-.product-image-wrap img{width:100%;height:auto;max-height:200px;object-fit:contain;display:block;}
+.product-image-wrap{width:100%;max-height:400px;overflow:hidden;border-radius:8px;margin-bottom:8px;background:#f8f8f8;}
+.product-image-wrap img{width:100%;height:auto;max-height:400px;object-fit:contain;display:block;}
 .no-results{text-align:center;padding:60px 20px;color:#999;}
 .no-results .icon{font-size:48px;margin-bottom:12px;}
 .footer-info{text-align:center;padding:20px;font-size:12px;color:#bbb;}
 .footer-info .phone{color:#0f3460;font-weight:600;}
+/* Image viewer */
+.img-viewer{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);z-index:9999;justify-content:center;align-items:center;cursor:pointer;}
+.img-viewer.show{display:flex;}
+.img-viewer img{max-width:95%;max-height:95%;object-fit:contain;}
+.img-viewer .close-btn{position:absolute;top:16px;right:16px;color:#fff;font-size:28px;background:rgba(0,0,0,.5);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:10px;color:#fff;font-size:14px;z-index:9999;opacity:0;transition:opacity .4s;pointer-events:none;}
 .toast.show{opacity:1;}
 .toast.success{background:#2e7d32;}
@@ -155,6 +160,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
     <button class="btn btn-primary" onclick="showAddPanel()">➕ 新增</button>
     <button class="btn btn-publish" onclick="publish()">📤 发布更新</button>
     <button class="btn btn-publish" style="background:#FF9800;" onclick="setToken()">🔑 设置Token</button>
+    <button class="btn btn-publish" style="background:#9C27B0;" onclick="setCfToken()">☁️ 部署</button>
     <button class="btn btn-danger" onclick="logout()">退出</button>
   </div>
 </div>
@@ -188,6 +194,12 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
     <div class="full"><label>成份</label><input id="edit-composition" type="text"></div>
     <div><label>价格</label><input id="edit-price" type="text"></div>
     <div><label>分类</label><input id="edit-category" type="text"></div>
+    <div class="full"><label>产品图片</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="file" id="edit-image" accept="image/jpeg,image/png,image/webp" style="flex:1;font-size:13px;">
+        <span id="edit-image-name" style="font-size:12px;color:#999;"></span>
+      </div>
+    </div>
   </div>
   <div class="edit-actions">
     <button class="btn btn-save" id="btn-save" onclick="saveEdit()">💾 保存</button>
@@ -203,25 +215,38 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 
 <div class="toast" id="toast"></div>
 
+<!-- Image viewer -->
+<div class="img-viewer" id="img-viewer" onclick="closeImageViewer()">
+  <span class="close-btn" onclick="closeImageViewer()">✕</span>
+  <img id="img-viewer-src" src="" onclick="event.stopPropagation()">
+</div>
+
 <script>
-var ALL = [];
+var ALL = [];           // 2D: ALL[catIdx][prodIdx]
+var ALL_FLAT = [];      // Flat array for fast lookup
 var selC = null, selS = "", searchText = "";
 var isAdmin = false;
 var ADMIN_PASSWORD = "cx888";
 var GITHUB_TOKEN = localStorage.getItem("gh_token") || "";
 var REPO_OWNER = "reggie66666";
 var REPO_NAME = "chaoxing-textile";
-var editingIdx = -1;
+var editingCatIdx = -1, editingProdIdx = -1;
 
 // Load products
 fetch('products.json')
   .then(function(r){ return r.json(); })
   .then(function(data){
-    ALL = data;
-    var cats = [], seen = {};
-    for(var i=0;i<ALL.length;i++){
-      var c = ALL[i].category;
-      if(!seen[c]){ seen[c]=true; cats.push(c); }
+    // Convert flat array to 2D array by category
+    var catMap = {}, cats = [];
+    for(var i=0;i<data.length;i++){
+      var c = data[i].category;
+      if(!catMap[c]){ catMap[c]=[]; cats.push(c); }
+      catMap[c].push(data[i]);
+    }
+    ALL = [];
+    ALL_FLAT = data;
+    for(var i=0;i<cats.length;i++){
+      ALL.push(catMap[cats[i]]);
     }
     var bar = document.getElementById("cat-bar");
     for(var i=0;i<cats.length;i++){
@@ -239,9 +264,30 @@ fetch('products.json')
     document.getElementById("container").innerHTML = '<div class="no-results"><div class="icon">❌</div><p>产品数据加载失败</p></div>';
   });
 
+// Update ALL_FLAT whenever ALL changes
+function rebuildFlat(){
+  ALL_FLAT = [];
+  for(var i=0;i<ALL.length;i++){
+    for(var j=0;j<ALL[i].length;j++){
+      ALL_FLAT.push(ALL[i][j]);
+    }
+  }
+}
+
+// Find product in 2D ALL array, returns {catIdx, prodIdx}
+function findInAll(prod){
+  for(var ci=0;ci<ALL.length;ci++){
+    for(var pi=0;pi<ALL[ci].length;pi++){
+      if(ALL[ci][pi] === prod) return {catIdx: ci, prodIdx: pi};
+    }
+  }
+  return null;
+}
+
 function render(){
   searchText = document.getElementById("search-input").value.trim().toLowerCase();
-  var f = ALL;
+  rebuildFlat();
+  var f = ALL_FLAT;
   if(selC) { var fc = []; for(var i=0;i<f.length;i++){ if(f[i].category===selC) fc.push(f[i]); } f = fc; }
   if(selS==="有弹") { var fs = []; for(var i=0;i<f.length;i++){ if(f[i].stretch!=="无弹") fs.push(f[i]); } f = fs; }
   else if(selS==="无弹") { var fs = []; for(var i=0;i<f.length;i++){ if(f[i].stretch==="无弹") fs.push(f[i]); } f = fs; }
@@ -266,9 +312,10 @@ function render(){
     for(var j=0;j<ps.length;j++){
       var p = ps[j];
       var st = p.stretch!=="无弹" ? '<span class="p-stretch yes">✅ '+p.stretch+'</span>' : '<span class="p-stretch no">无弹</span>';
-      var imgHtml = p.image ? '<div class="product-image-wrap"><img src="products/'+p.image+'" alt="'+p.code+'" loading="lazy" onclick="window.open(this.src)"></div>' : '';
+      var imgHtml = p.image ? '<div class="product-image-wrap"><img src="https://raw.githubusercontent.com/'+REPO_OWNER+'/'+REPO_NAME+'/main/products/'+p.image+'" alt="'+p.code+'" loading="lazy" onclick="openImageViewer(this.src)"></div>' : '';
       var pr = (isAdmin && p.price) ? '<div class="p-price" style="margin-top:6px;font-size:15px;font-weight:700;color:#e74c3c;">¥'+p.price+'/米</div>' : '';
-      var editBtn = isAdmin ? '<button class="card-edit-btn" onclick="openEdit('+ci+','+j+')">✏️</button>' : '';
+      var flatIdx = ALL_FLAT.indexOf(p);
+      var editBtn = isAdmin ? '<button class="card-edit-btn" onclick="openEditByFlatIdx('+flatIdx+')">✏️</button>' : '';
       var cl = (p.colors && p.colors.length>2) ? p.colors : "";
       h += '<div class="product-card'+(isAdmin?' admin-mode':'')+'">'+imgHtml+'<div class="p-code">'+p.code+editBtn+'</div>'+st+pr+'<div class="p-detail">'+
         (p.spec?'<span><span class="label">规格</span> '+p.spec+'</span>':'')+
@@ -312,11 +359,13 @@ function logout(){
 }
 
 // ── Edit ──
-var _editCatIdx=-1,_editProdIdx=-1;
-function openEdit(ci,pi){
-  _editCatIdx=ci; _editProdIdx=pi;
-  var p = ALL[ci][pi];
-  editingIdx = ci;
+function openEditByFlatIdx(flatIdx){
+  if(flatIdx < 0 || flatIdx >= ALL_FLAT.length) return;
+  var p = ALL_FLAT[flatIdx];
+  var found = findInAll(p);
+  if(!found){ showToast("❌ 找不到产品","error"); return; }
+  editingCatIdx = found.catIdx;
+  editingProdIdx = found.prodIdx;
   document.getElementById("edit-title").textContent="✏️ 编辑 "+p.code;
   document.getElementById("edit-code").value=p.code||"";
   document.getElementById("edit-colors").value=p.colors||"";
@@ -327,15 +376,18 @@ function openEdit(ci,pi){
   document.getElementById("edit-price").value=p.price||"";
   document.getElementById("edit-category").value=p.category||"";
   document.getElementById("edit-stretch").value=p.stretch||"无弹";
+  document.getElementById("edit-image").value="";
+  document.getElementById("edit-image-name").textContent = p.image ? "当前: "+p.image : "无图片";
   document.getElementById("btn-save").textContent="💾 保存";
   document.getElementById("btn-save").onclick=saveEdit;
   document.getElementById("btn-delete").style.display="";
   document.getElementById("edit-panel").classList.add("show");
 }
-function hideEditPanel(){ document.getElementById("edit-panel").classList.remove("show"); editingIdx=-1; }
+function hideEditPanel(){ document.getElementById("edit-panel").classList.remove("show"); editingCatIdx=-1; editingProdIdx=-1; }
 
 function saveEdit(){
-  var p = ALL[_editCatIdx][_editProdIdx];
+  if(editingCatIdx<0 || editingProdIdx<0){ showToast("❌ 请先选择产品","error"); return; }
+  var p = ALL[editingCatIdx][editingProdIdx];
   p.code = document.getElementById("edit-code").value.trim();
   p.colors = document.getElementById("edit-colors").value.trim();
   p.spec = document.getElementById("edit-spec").value.trim();
@@ -345,13 +397,89 @@ function saveEdit(){
   p.price = document.getElementById("edit-price").value.trim();
   p.category = document.getElementById("edit-category").value.trim();
   p.stretch = document.getElementById("edit-stretch").value;
-  hideEditPanel(); render();
-  showToast("✅ 已保存（点击「📤 发布更新」同步到网站）","success");
+  
+  // Handle image upload
+  var fileInput = document.getElementById("edit-image");
+  var file = fileInput.files[0];
+  if(file){
+    var ext = file.name.split('.').pop().toLowerCase();
+    if(["jpg","jpeg","png","webp"].indexOf(ext)<0){ showToast("仅支持 jpg/png/webp","error"); return; }
+    var filename = editingCatIdx + "_" + editingProdIdx + "_" + Date.now() + "." + ext;
+    var oldImg = p.image;
+    showToast("⏳ 上传图片中...","success");
+    
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var b64 = e.target.result.split(",")[1]; // Remove data:image/...;base64,
+      fetch("https://api.github.com/repos/"+REPO_OWNER+"/"+REPO_NAME+"/contents/products/"+filename, {
+        method: "PUT",
+        headers: {
+          "Authorization": "Bearer "+GITHUB_TOKEN,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "上传产品图片 "+filename,
+          content: b64
+        })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if(data.content){
+          p.image = filename;
+          hideEditPanel(); render();
+          showToast("✅ 图片已上传并保存（点击发布更新同步到网站）","success");
+        } else if(data.message && data.message.indexOf("sha")>=0){
+          // File exists, need SHA
+          fetch("https://api.github.com/repos/"+REPO_OWNER+"/"+REPO_NAME+"/contents/products/"+filename, {
+            headers: {"Authorization": "Bearer "+GITHUB_TOKEN}
+          })
+          .then(function(r2){ return r2.json(); })
+          .then(function(existing){
+            return fetch("https://api.github.com/repos/"+REPO_OWNER+"/"+REPO_NAME+"/contents/products/"+filename, {
+              method: "PUT",
+              headers: {
+                "Authorization": "Bearer "+GITHUB_TOKEN,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                message: "更新产品图片 "+filename,
+                content: b64,
+                sha: existing.sha
+              })
+            });
+          })
+          .then(function(r3){ return r3.json(); })
+          .then(function(data2){
+            if(data2.content){
+              p.image = filename;
+              hideEditPanel(); render();
+              showToast("✅ 图片已更新并保存","success");
+            } else {
+              showToast("❌ 图片上传失败: "+JSON.stringify(data2),"error");
+              hideEditPanel(); render();
+            }
+          });
+        } else {
+          showToast("❌ 图片上传失败: "+JSON.stringify(data),"error");
+          hideEditPanel(); render();
+        }
+      })
+      .catch(function(err){
+        showToast("❌ 上传失败: "+err.message,"error");
+        hideEditPanel(); render();
+      });
+    };
+    reader.readAsDataURL(file);
+  } else {
+    hideEditPanel(); render();
+    showToast("✅ 已保存（点击「📤 发布更新」同步到网站）","success");
+  }
 }
 
 function deleteProduct(){
+  if(editingCatIdx<0 || editingProdIdx<0){ showToast("❌ 请先选择产品","error"); return; }
   if(!confirm("确定删除这产品？")) return;
-  ALL[_editCatIdx].splice(_editProdIdx,1);
+  ALL[editingCatIdx].splice(editingProdIdx,1);
   hideEditPanel(); render();
   showToast("✅ 已删除（点击「📤 发布更新」同步到网站）","success");
 }
@@ -367,6 +495,8 @@ function showAddPanel(){
   document.getElementById("edit-price").value="";
   document.getElementById("edit-category").value="";
   document.getElementById("edit-stretch").value="无弹";
+  document.getElementById("edit-image").value="";
+  document.getElementById("edit-image-name").textContent="可上传图片";
   document.getElementById("btn-save").textContent="✅ 确认添加";
   document.getElementById("btn-save").onclick=confirmAdd;
   document.getElementById("btn-delete").style.display="none";
@@ -386,14 +516,45 @@ function confirmAdd(){
     stretch: document.getElementById("edit-stretch").value
   };
   if(!prod.code){ showToast("款号不能为空","error"); return; }
-  // Add to ALL
-  var found=false;
-  for(var i=0;i<ALL.length;i++){
-    if(ALL[i].category===prod.category){ ALL[i].push(prod); found=true; break; }
+  
+  var fileInput = document.getElementById("edit-image");
+  var file = fileInput.files[0];
+  
+  function doAdd(imgName){
+    if(imgName) prod.image = imgName;
+    var found=false;
+    for(var i=0;i<ALL.length;i++){
+      if(ALL[i].length>0 && ALL[i][0].category===prod.category){ ALL[i].push(prod); found=true; break; }
+    }
+    if(!found){ ALL.push([prod]); }
+    hideEditPanel(); rebuildFlat(); render();
+    showToast("✅ 已添加（点击「📤 发布更新」同步到网站）","success");
   }
-  if(!found){ ALL.push([prod]); }
-  hideEditPanel(); render();
-  showToast("✅ 已添加（点击「📤 发布更新」同步到网站）","success");
+  
+  if(file){
+    var ext = file.name.split('.').pop().toLowerCase();
+    if(["jpg","jpeg","png","webp"].indexOf(ext)<0){ showToast("仅支持 jpg/png/webp","error"); return; }
+    var filename = "new_" + Date.now() + "." + ext;
+    showToast("⏳ 上传图片中...","success");
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var b64 = e.target.result.split(",")[1];
+      fetch("https://api.github.com/repos/"+REPO_OWNER+"/"+REPO_NAME+"/contents/products/"+filename, {
+        method: "PUT",
+        headers: {
+          "Authorization": "Bearer "+GITHUB_TOKEN,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({message: "上传产品图片", content: b64})
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data){ doAdd(data.content ? filename : null); })
+      .catch(function(){ doAdd(null); });
+    };
+    reader.readAsDataURL(file);
+  } else {
+    doAdd(null);
+  }
 }
 
 // ── Publish to GitHub ──
@@ -457,6 +618,65 @@ function setToken(){
     GITHUB_TOKEN = n.trim();
     showToast("✅ Token 已保存到本地浏览器！", "success");
   }
+}
+
+function setCfToken(){
+  var t = localStorage.getItem("cf_token") || "";
+  var n = prompt("请输入你的 Cloudflare API Token（cfut_开头）：", t);
+  if(n && n.trim()){
+    localStorage.setItem("cf_token", n.trim());
+    showToast("✅ Cloudflare Token 已保存！", "success");
+  }
+}
+
+// ── Deploy to Cloudflare ──
+function deployToCloudflare(){
+  if(!isAdmin){ showToast("请先登录","error"); return; }
+  var cfToken = localStorage.getItem("cf_token");
+  if(!cfToken){ showToast("请先设置 Cloudflare Token","error"); return; }
+  if(!confirm("确定部署到 Cloudflare 网站？")) return;
+  
+  showToast("⏳ 正在部署到 Cloudflare...","success");
+  
+  // Get list of files from the current site
+  var files = ["index.html", "products.json", "bg.jpg"];
+  // We need to fetch existing products dir files too
+  // Simple approach: deploy just products.json (the data change)
+  // For images, they're already uploaded to GitHub, just need to deploy
+  
+  // Create a deployment via Cloudflare API
+  var manifest = {};
+  manifest["index.html"] = "index.html";
+  manifest["products.json"] = "products.json";
+  
+  fetch("https://api.cloudflare.com/client/v4/accounts/5087ee234e5e131c7b9aaff18502c8b0/pages/projects/cxtextile/deployments", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer "+cfToken,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({manifest: manifest})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.success){
+      showToast("✅ 发布成功！网站将在1-2分钟更新","success");
+    } else {
+      showToast("❌ 部署失败: "+(data.errors[0]?.message||JSON.stringify(data)),"error");
+    }
+  })
+  .catch(function(e){
+    showToast("❌ 部署失败: "+e.message,"error");
+  });
+}
+
+// ── Image Viewer ──
+function openImageViewer(src){
+  document.getElementById("img-viewer-src").src = src;
+  document.getElementById("img-viewer").classList.add("show");
+}
+function closeImageViewer(){
+  document.getElementById("img-viewer").classList.remove("show");
 }
 
 // ── Toast ──
