@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>潮兴纺织 - 产品查询</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;background:#f5f5f5;color:#333;min-height:100vh;}
+.header{background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url('bg.jpg') center/cover;color:#fff;padding:16px 16px 10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15);}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.header h1{font-size:18px;font-weight:700;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.count-badge{background:rgba(255,255,255,.2);padding:4px 10px;border-radius:20px;font-size:11px;white-space:nowrap;}
+.filter-toggle{background:rgba(255,255,255,.15);border:none;color:#fff;padding:5px 10px;border-radius:16px;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:3px;}
+.filter-toggle:hover{background:rgba(255,255,255,.25);}
+.filter-toggle .arrow{display:inline-block;transition:transform .3s;font-size:10px;}
+.filter-toggle .arrow.open{transform:rotate(180deg);}
+.filter-body{overflow:hidden;transition:max-height .35s ease,opacity .3s ease;max-height:400px;opacity:1;}
+.filter-body.collapsed{max-height:0;opacity:0;padding-top:0;}
+.search-bar input{width:100%;padding:10px 14px;border:none;border-radius:10px;font-size:14px;outline:none;}
+.filter-section{margin-top:10px;}
+.filter-label{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;}
+.filter-bar{display:flex;flex-wrap:wrap;gap:5px;}
+.filter-bar+.filter-bar{margin-top:6px;}
+.filter-tag{padding:4px 10px;border-radius:20px;font-size:12px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);cursor:pointer;user-select:none;transition:all .2s;white-space:nowrap;}
+.filter-tag.active{background:#fff;color:#0f3460;font-weight:600;}
+.container{max-width:800px;margin:0 auto;padding:12px;padding-bottom:80px;}
+.category-group{margin-bottom:12px;}
+.category-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);cursor:pointer;transition:all .2s;}
+.category-header:active{transform:scale(.98);}
+.cat-name{font-size:15px;font-weight:600;color:#1a1a2e;}
+.cat-count{font-size:12px;color:#999;}
+.arrow{color:#ccc;font-size:14px;transition:transform .3s;}
+.arrow.open{transform:rotate(180deg);}
+.category-products{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.category-products.open{max-height:20000px;}
+.product-card{background:#fff;margin-top:8px;border-radius:10px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.05);border-left:3px solid #0f3460;transition:border-color .3s;}
+.product-card.admin-mode{border-left-color:#e74c3c;}
+.p-code{font-size:14px;font-weight:700;color:#0f3460;margin-bottom:6px;}
+.p-stretch{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-top:4px;margin-bottom:6px;}
+.p-stretch.yes{background:#e8f5e9;color:#2e7d32;}
+.p-stretch.no{background:#f5f5f5;color:#999;}
+.p-detail{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px;font-size:13px;color:#555;line-height:1.6;}
+.p-detail .label{color:#999;}
+.p-colors{margin-top:6px;font-size:12px;color:#666;background:#f8f8f8;padding:6px 10px;border-radius:6px;line-height:1.6;}
+.p-colors .label{color:#999;}
+.product-card{position:relative;}
+.product-image-wrap{width:100%;max-height:200px;overflow:hidden;border-radius:8px;margin-bottom:8px;background:#f8f8f8;}
+.product-image-wrap img{width:100%;height:auto;max-height:200px;object-fit:contain;display:block;}
+.no-results{text-align:center;padding:60px 20px;color:#999;}
+.no-results .icon{font-size:48px;margin-bottom:12px;}
+.footer-info{text-align:center;padding:20px;font-size:12px;color:#bbb;}
+.footer-info .phone{color:#0f3460;font-weight:600;}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:10px;color:#fff;font-size:14px;z-index:9999;opacity:0;transition:opacity .4s;pointer-events:none;}
+.toast.show{opacity:1;}
+.toast.success{background:#2e7d32;}
+.toast.error{background:#e74c3c;}
+.loading{text-align:center;padding:60px 20px;color:#999;}
+.loading .spinner{display:inline-block;width:32px;height:32px;border:3px solid #eee;border-top:3px solid #0f3460;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Admin */
+.admin-login-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 10px;border-radius:16px;font-size:12px;cursor:pointer;}
+.admin-bar{display:none;background:#0f3460;padding:10px 14px;align-items:center;flex-wrap:wrap;gap:8px;justify-content:space-between;margin-top:10px;border-radius:10px;}
+.admin-bar.show{display:flex;}
+.admin-bar .btn{padding:7px 14px;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600;}
+.admin-bar .btn-primary{background:#fff;color:#0f3460;}
+.admin-bar .btn-danger{background:#e74c3c;color:#fff;}
+.admin-bar .status{color:rgba(255,255,255,.7);font-size:12px;}
+.admin-bar .btn-publish{background:#4CAF50;color:#fff;}
+.card-edit-btn{display:none;float:right;padding:4px 10px;background:#0f3460;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;}
+.admin-mode .card-edit-btn{display:inline-block;}
+.edit-panel{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.2);z-index:200;padding:20px 16px;max-height:80vh;overflow-y:auto;animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.edit-panel.show{display:block;}
+.edit-panel .handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 14px;}
+.edit-panel h3{font-size:16px;color:#1a1a2e;margin-bottom:12px;}
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.edit-grid .full{grid-column:1/-1;}
+.edit-grid label{font-size:12px;color:#999;display:block;margin-bottom:2px;}
+.edit-grid input,.edit-grid select{padding:8px 10px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px;outline:none;width:100%;}
+.edit-grid input:focus,.edit-grid select:focus{border-color:#0f3460;}
+.edit-actions{display:flex;gap:8px;margin-top:14px;}
+.edit-actions .btn{flex:1;padding:10px;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-weight:600;}
+.edit-actions .btn-save{background:#0f3460;color:#fff;}
+.edit-actions .btn-cancel{background:#f0f0f0;color:#666;}
+.edit-actions .btn-delete{background:#fff;color:#e74c3c;border:2px solid #e74c3c;}
+/* Login */
+.login-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:300;justify-content:center;align-items:center;}
+.login-overlay.show{display:flex;}
+.login-box{background:#fff;border-radius:16px;padding:28px 24px;width:320px;max-width:90vw;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.2);}
+.login-box h3{font-size:18px;color:#1a1a2e;margin-bottom:16px;}
+.login-box input{width:100%;padding:12px 14px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;outline:none;margin-bottom:12px;}
+.login-box input:focus{border-color:#0f3460;}
+.login-box .btn-row{display:flex;gap:8px;}
+.login-box .btn-row button{flex:1;padding:10px;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-weight:600;}
+.login-box .btn-login{background:#0f3460;color:#fff;}
+.login-box .btn-close{background:#f0f0f0;color:#666;}
+.login-box .error{color:#e74c3c;font-size:13px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <h1>🏭 潮兴纺织</h1>
+    </div>
+    <div class="header-right">
+      <button class="admin-login-btn" id="admin-login-btn" onclick="showLogin()">🔑</button>
+      <button class="filter-toggle" onclick="toggleFilter()">
+        <span>🔍</span> 筛选 <span class="arrow open" id="filter-arrow">▼</span>
+      </button>
+      <span class="count-badge" id="total-count">加载中...</span>
+    </div>
+  </div>
+  <div class="filter-body" id="filter-body">
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="🔍 搜索款号、颜色、规格、成份..." oninput="render()">
+  </div>
+  <div class="filter-section">
+    <div class="filter-label">弹力筛选</div>
+    <div class="filter-bar" id="stretch-bar">
+      <span class="filter-tag active" data-s="" onclick="setS('')">全部</span>
+      <span class="filter-tag" data-s="有弹" onclick="setS('有弹')" style="background:rgba(76,175,80,.25)">🟢 有弹力</span>
+      <span class="filter-tag" data-s="无弹" onclick="setS('无弹')">⚪ 无弹力</span>
+      <span class="filter-tag" data-s="高弹" onclick="setS('高弹')">🔝 高弹</span>
+      <span class="filter-tag" data-s="四面弹" onclick="setS('四面弹')">↕ 四面弹</span>
+    </div>
+    <div class="filter-label" style="margin-top:6px;">分类筛选</div>
+    <div class="filter-bar" id="cat-bar">
+      <span class="filter-tag active" onclick="setC(null)">全部分类</span>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- Login overlay -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <h3>🔐 管理员登录</h3>
+    <div class="error" id="login-error"></div>
+    <input type="password" id="login-pwd" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="btn-row">
+      <button class="btn-login" onclick="doLogin()">登录</button>
+      <button class="btn-close" onclick="hideLogin()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin bar -->
+<div class="admin-bar" id="admin-bar">
+  <span class="status">管理员 <span id="admin-name">👤</span></span>
+  <div style="display:flex;gap:6px;">
+    <button class="btn btn-primary" onclick="showAddPanel()">➕ 新增</button>
+    <button class="btn btn-publish" onclick="publish()">📤 发布更新</button>
+    <button class="btn btn-publish" style="background:#FF9800;" onclick="setToken()">🔑 设置Token</button>
+    <button class="btn btn-danger" onclick="logout()">退出</button>
+  </div>
+</div>
+
+<div class="container" id="container">
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>加载产品数据中...</p>
+  </div>
+</div>
+
+<!-- Edit panel -->
+<div class="edit-panel" id="edit-panel">
+  <div class="handle"></div>
+  <h3 id="edit-title">编辑产品</h3>
+  <input type="hidden" id="edit-idx">
+  <div class="edit-grid">
+    <div><label>款号</label><input id="edit-code" type="text"></div>
+    <div><label>弹力</label>
+      <select id="edit-stretch">
+        <option value="无弹">无弹</option>
+        <option value="弹力">弹力</option>
+        <option value="高弹">高弹</option>
+        <option value="四面弹">四面弹</option>
+      </select>
+    </div>
+    <div class="full"><label>颜色</label><input id="edit-colors" type="text"></div>
+    <div class="full"><label>规格</label><input id="edit-spec" type="text"></div>
+    <div><label>门幅</label><input id="edit-width" type="text"></div>
+    <div><label>克重</label><input id="edit-weight" type="text"></div>
+    <div class="full"><label>成份</label><input id="edit-composition" type="text"></div>
+    <div><label>价格</label><input id="edit-price" type="text"></div>
+    <div><label>分类</label><input id="edit-category" type="text"></div>
+  </div>
+  <div class="edit-actions">
+    <button class="btn btn-save" id="btn-save" onclick="saveEdit()">💾 保存</button>
+    <button class="btn btn-cancel" onclick="hideEditPanel()">取消</button>
+    <button class="btn btn-delete" id="btn-delete" onclick="deleteProduct()">🗑 删除</button>
+  </div>
+</div>
+
+<div class="footer-info">
+  潮兴纺织 · 门市部电话：<span class="phone">0757-85700230</span><br>
+  手机：<span class="phone">13138289122</span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var ALL = [];
+var selC = null, selS = "", searchText = "";
+var isAdmin = false;
+var ADMIN_PASSWORD = "cx888";
+var GITHUB_TOKEN = localStorage.getItem("gh_token") || "";
+var REPO_OWNER = "reggie66666";
+var REPO_NAME = "chaoxing-textile";
+var editingIdx = -1;
+
+// Load products
+fetch('products.json')
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    ALL = data;
+    var cats = [], seen = {};
+    for(var i=0;i<ALL.length;i++){
+      var c = ALL[i].category;
+      if(!seen[c]){ seen[c]=true; cats.push(c); }
+    }
+    var bar = document.getElementById("cat-bar");
+    for(var i=0;i<cats.length;i++){
+      (function(c){
+        var e = document.createElement("span");
+        e.className = "filter-tag";
+        e.textContent = c;
+        e.onclick = function(){ setC(c); };
+        bar.appendChild(e);
+      })(cats[i]);
+    }
+    render();
+  })
+  .catch(function(e){
+    document.getElementById("container").innerHTML = '<div class="no-results"><div class="icon">❌</div><p>产品数据加载失败</p></div>';
+  });
+
+function render(){
+  searchText = document.getElementById("search-input").value.trim().toLowerCase();
+  var f = ALL;
+  if(selC) { var fc = []; for(var i=0;i<f.length;i++){ if(f[i].category===selC) fc.push(f[i]); } f = fc; }
+  if(selS==="有弹") { var fs = []; for(var i=0;i<f.length;i++){ if(f[i].stretch!=="无弹") fs.push(f[i]); } f = fs; }
+  else if(selS==="无弹") { var fs = []; for(var i=0;i<f.length;i++){ if(f[i].stretch==="无弹") fs.push(f[i]); } f = fs; }
+  else if(selS) { var fs = []; for(var i=0;i<f.length;i++){ if(f[i].stretch===selS) fs.push(f[i]); } f = fs; }
+  if(searchText) { var fs = []; var s = searchText;
+    for(var i=0;i<f.length;i++){
+      var p = f[i];
+      if(p.code.toLowerCase().indexOf(s)>=0 || p.colors.toLowerCase().indexOf(s)>=0 || p.composition.toLowerCase().indexOf(s)>=0 || p.spec.toLowerCase().indexOf(s)>=0)
+        fs.push(p);
+    } f = fs;
+  }
+  document.getElementById("total-count").textContent = f.length + " 个产品";
+  var ct = document.getElementById("container");
+  if(f.length===0){ ct.innerHTML='<div class="no-results"><div class="icon">🔍</div><p>没有找到匹配的产品</p></div>'; return; }
+  var cats = [], g = {};
+  for(var i=0;i<f.length;i++){ var c = f[i].category; if(!g[c]){ g[c]=[]; cats.push(c); } g[c].push(f[i]); }
+  var h = "";
+  for(var ci=0; ci<cats.length; ci++){
+    var cat = cats[ci], ps = g[cat];
+    var id = "cg" + ci;
+    h += '<div class="category-group"><div class="category-header" onclick="t(\''+id+'\')"><span class="cat-name">'+cat+'</span><span style="display:flex;align-items:center;gap:8px;"><span class="cat-count">'+ps.length+' 款</span><span class="arrow open" id="a'+id+'">▼</span></span></div><div class="category-products open" id="'+id+'">';
+    for(var j=0;j<ps.length;j++){
+      var p = ps[j];
+      var st = p.stretch!=="无弹" ? '<span class="p-stretch yes">✅ '+p.stretch+'</span>' : '<span class="p-stretch no">无弹</span>';
+      var imgHtml = p.image ? '<div class="product-image-wrap"><img src="products/'+p.image+'" alt="'+p.code+'" loading="lazy" onclick="window.open(this.src)"></div>' : '';
+      var pr = (isAdmin && p.price) ? '<div class="p-price" style="margin-top:6px;font-size:15px;font-weight:700;color:#e74c3c;">¥'+p.price+'/米</div>' : '';
+      var editBtn = isAdmin ? '<button class="card-edit-btn" onclick="openEdit('+ci+','+j+')">✏️</button>' : '';
+      var cl = (p.colors && p.colors.length>2) ? p.colors : "";
+      h += '<div class="product-card'+(isAdmin?' admin-mode':'')+'">'+imgHtml+'<div class="p-code">'+p.code+editBtn+'</div>'+st+pr+'<div class="p-detail">'+
+        (p.spec?'<span><span class="label">规格</span> '+p.spec+'</span>':'')+
+        (p.width?'<span><span class="label">门幅</span> '+p.width+'cm</span>':'')+
+        (p.weight?'<span><span class="label">克重</span> '+p.weight+'g</span>':'')+
+        (p.composition?'<span><span class="label">成份</span> '+p.composition+'</span>':'')+
+        '</div>'+(cl?'<div class="p-colors"><span class="label">颜色</span> '+cl+'</div>':'')+'</div>';
+    }
+    h += '</div></div>';
+  }
+  ct.innerHTML = h;
+}
+
+function t(id){ var e=document.getElementById(id),a=document.getElementById("a"+id); if(e){ e.classList.toggle("open"); if(a) a.classList.toggle("open"); } }
+function toggleFilter(){ var b=document.getElementById("filter-body"),a=document.getElementById("filter-arrow"); b.classList.toggle("collapsed"); a.classList.toggle("open"); }
+function setC(c){ selC=c; var ts=document.querySelectorAll("#cat-bar .filter-tag"); for(var i=0;i<ts.length;i++){ ts[i].classList.toggle("active",(i===0&&!c)||ts[i].textContent===c); } render(); }
+function setS(s){ selS=s; var ts=document.querySelectorAll("#stretch-bar .filter-tag"); for(var i=0;i<ts.length;i++){ ts[i].classList.toggle("active",ts[i].getAttribute("data-s")===s); } render(); }
+
+// ── Login ──
+function showLogin(){ document.getElementById("login-overlay").classList.add("show"); setTimeout(function(){ document.getElementById("login-pwd").focus(); },100); }
+function hideLogin(){ document.getElementById("login-overlay").classList.remove("show"); document.getElementById("login-error").textContent=""; }
+function doLogin(){
+  if(document.getElementById("login-pwd").value===ADMIN_PASSWORD){
+    isAdmin=true; hideLogin();
+    document.getElementById("login-pwd").value="";
+    document.getElementById("admin-bar").classList.add("show");
+    document.getElementById("admin-login-btn").innerHTML="🔒";
+    document.getElementById("admin-login-btn").onclick=logout;
+    document.getElementById("admin-name").textContent="已登录";
+    showToast("✅ 已进入管理模式","success");
+    render();
+  } else { document.getElementById("login-error").textContent="❌ 密码错误"; }
+}
+function logout(){
+  if(!confirm("确定退出？")) return;
+  isAdmin=false; hideEditPanel();
+  document.getElementById("admin-bar").classList.remove("show");
+  document.getElementById("admin-login-btn").innerHTML="🔑";
+  document.getElementById("admin-login-btn").onclick=showLogin;
+  showToast("已退出","success"); render();
+}
+
+// ── Edit ──
+var _editCatIdx=-1,_editProdIdx=-1;
+function openEdit(ci,pi){
+  _editCatIdx=ci; _editProdIdx=pi;
+  var p = ALL[ci][pi];
+  editingIdx = ci;
+  document.getElementById("edit-title").textContent="✏️ 编辑 "+p.code;
+  document.getElementById("edit-code").value=p.code||"";
+  document.getElementById("edit-colors").value=p.colors||"";
+  document.getElementById("edit-spec").value=p.spec||"";
+  document.getElementById("edit-width").value=p.width||"";
+  document.getElementById("edit-weight").value=p.weight||"";
+  document.getElementById("edit-composition").value=p.composition||"";
+  document.getElementById("edit-price").value=p.price||"";
+  document.getElementById("edit-category").value=p.category||"";
+  document.getElementById("edit-stretch").value=p.stretch||"无弹";
+  document.getElementById("btn-save").textContent="💾 保存";
+  document.getElementById("btn-save").onclick=saveEdit;
+  document.getElementById("btn-delete").style.display="";
+  document.getElementById("edit-panel").classList.add("show");
+}
+function hideEditPanel(){ document.getElementById("edit-panel").classList.remove("show"); editingIdx=-1; }
+
+function saveEdit(){
+  var p = ALL[_editCatIdx][_editProdIdx];
+  p.code = document.getElementById("edit-code").value.trim();
+  p.colors = document.getElementById("edit-colors").value.trim();
+  p.spec = document.getElementById("edit-spec").value.trim();
+  p.width = document.getElementById("edit-width").value.trim();
+  p.weight = document.getElementById("edit-weight").value.trim();
+  p.composition = document.getElementById("edit-composition").value.trim();
+  p.price = document.getElementById("edit-price").value.trim();
+  p.category = document.getElementById("edit-category").value.trim();
+  p.stretch = document.getElementById("edit-stretch").value;
+  hideEditPanel(); render();
+  showToast("✅ 已保存（点击「📤 发布更新」同步到网站）","success");
+}
+
+function deleteProduct(){
+  if(!confirm("确定删除这产品？")) return;
+  ALL[_editCatIdx].splice(_editProdIdx,1);
+  hideEditPanel(); render();
+  showToast("✅ 已删除（点击「📤 发布更新」同步到网站）","success");
+}
+
+function showAddPanel(){
+  document.getElementById("edit-title").textContent="➕ 新增产品";
+  document.getElementById("edit-code").value="";
+  document.getElementById("edit-colors").value="";
+  document.getElementById("edit-spec").value="";
+  document.getElementById("edit-width").value="";
+  document.getElementById("edit-weight").value="";
+  document.getElementById("edit-composition").value="";
+  document.getElementById("edit-price").value="";
+  document.getElementById("edit-category").value="";
+  document.getElementById("edit-stretch").value="无弹";
+  document.getElementById("btn-save").textContent="✅ 确认添加";
+  document.getElementById("btn-save").onclick=confirmAdd;
+  document.getElementById("btn-delete").style.display="none";
+  document.getElementById("edit-panel").classList.add("show");
+}
+
+function confirmAdd(){
+  var prod = {
+    code: document.getElementById("edit-code").value.trim(),
+    colors: document.getElementById("edit-colors").value.trim(),
+    spec: document.getElementById("edit-spec").value.trim(),
+    width: document.getElementById("edit-width").value.trim(),
+    weight: document.getElementById("edit-weight").value.trim(),
+    composition: document.getElementById("edit-composition").value.trim(),
+    price: document.getElementById("edit-price").value.trim(),
+    category: document.getElementById("edit-category").value.trim(),
+    stretch: document.getElementById("edit-stretch").value
+  };
+  if(!prod.code){ showToast("款号不能为空","error"); return; }
+  // Add to ALL
+  var found=false;
+  for(var i=0;i<ALL.length;i++){
+    if(ALL[i].category===prod.category){ ALL[i].push(prod); found=true; break; }
+  }
+  if(!found){ ALL.push([prod]); }
+  hideEditPanel(); render();
+  showToast("✅ 已添加（点击「📤 发布更新」同步到网站）","success");
+}
+
+// ── Publish to GitHub ──
+function publish(){
+  if(!isAdmin){ showToast("请先登录","error"); return; }
+  if(!confirm("确定发布更新到网站？访客将看到最新数据。")) return;
+
+  showToast("⏳ 正在发布...","success");
+
+  // Flatten ALL back to array
+  var flat = [];
+  for(var i=0;i<ALL.length;i++){
+    for(var j=0;j<ALL[i].length;j++){
+      flat.push(ALL[i][j]);
+    }
+  }
+  var jsonStr = JSON.stringify(flat, null, 2);
+
+  // Base64 encode
+  var b64 = btoa(unescape(encodeURIComponent(jsonStr)));
+
+  // Get current file SHA (needed to update)
+  fetch("https://api.github.com/repos/"+REPO_OWNER+"/"+REPO_NAME+"/contents/products.json", {
+    headers: {"Authorization": "Bearer "+GITHUB_TOKEN}
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var sha = data.sha;
+    return fetch("https://api.github.com/repos/"+REPO_OWNER+"/"+REPO_NAME+"/contents/products.json", {
+      method: "PUT",
+      headers: {
+        "Authorization": "Bearer "+GITHUB_TOKEN,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "更新产品数据",
+        content: b64,
+        sha: sha
+      })
+    });
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.content){
+      showToast("✅ 发布成功！网站将在1-2分钟内更新","success");
+    } else {
+      showToast("❌ 发布失败: "+JSON.stringify(data),"error");
+    }
+  })
+  .catch(function(e){
+    showToast("❌ 发布失败: "+(e.message||JSON.stringify(e)),"error");
+  });
+}
+
+// ── Token management ──
+function setToken(){
+  var t = localStorage.getItem("gh_token") || "";
+  var n = prompt("请输入你的 GitHub Token（ghp_开头）：", t);
+  if(n && n.trim()){
+    localStorage.setItem("gh_token", n.trim());
+    GITHUB_TOKEN = n.trim();
+    showToast("✅ Token 已保存到本地浏览器！", "success");
+  }
+}
+
+// ── Toast ──
+function showToast(msg,type){
+  var el=document.getElementById("toast");
+  el.textContent=msg;
+  el.className="toast "+type+" show";
+  clearTimeout(el._timer);
+  el._timer=setTimeout(function(){el.classList.remove("show");},3000);
+}
+</script>
+</body>
+</html>
