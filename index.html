@@ -159,6 +159,8 @@ body{font-family:-apple-system,PingFang SC,Helvetica Neue,sans-serif;background:
   <span class="status">管理员 <span id="admin-name">👤</span></span>
   <div style="display:flex;gap:6px;">
     <button class="btn btn-primary" onclick="showAddPanel()">➕ 新增</button>
+    <button class="btn btn-publish" onclick="document.getElementById('excel-input').click()">📊 上传Excel</button>
+    <input type="file" id="excel-input" accept=".xls,.xlsx" style="display:none" onchange="uploadExcel(this.files[0])">
     <button class="btn btn-publish" onclick="publish()">📤 发布更新</button>
     <button class="btn btn-publish" style="background:#FF9800;" onclick="setToken()">🔑 设置Token</button>
     <button class="btn btn-publish" style="background:#9C27B0;" onclick="setCfToken()">☁️ 部署</button>
@@ -224,6 +226,7 @@ body{font-family:-apple-system,PingFang SC,Helvetica Neue,sans-serif;background:
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 var ALL = [];           // 2D: ALL[catIdx][prodIdx]
 var ALL_FLAT = [];      // Flat array for fast lookup
@@ -235,36 +238,70 @@ var REPO_OWNER = "reggie66666";
 var REPO_NAME = "chaoxing-textile";
 var editingCatIdx = -1, editingProdIdx = -1;
 
-// Load products
-fetch('products.json')
+// ── localStorage cache for instant load ──
+var CACHE_KEY = "cx_products_cache";
+function saveCache(){
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({time:Date.now(), data:ALL_FLAT})); } catch(e){}
+}
+function loadCache(){
+  try {
+    var cached = localStorage.getItem(CACHE_KEY);
+    if(cached){
+      var c = JSON.parse(cached);
+      if(c && c.data && c.data.length>0) return c.data;
+    }
+  } catch(e){}
+  return null;
+}
+
+// ── Load products (instant from cache, then refresh in background) ──
+function initProducts(data){
+  var catMap = {}, cats = [];
+  for(var i=0;i<data.length;i++){
+    var c = data[i].category;
+    if(!catMap[c]){ catMap[c]=[]; cats.push(c); }
+    catMap[c].push(data[i]);
+  }
+  ALL = [];
+  ALL_FLAT = data;
+  for(var i=0;i<cats.length;i++){
+    ALL.push(catMap[cats[i]]);
+  }
+  var bar = document.getElementById("cat-bar");
+  // Clear existing filter tags except "全部分类"
+  while(bar.children.length>1) bar.removeChild(bar.lastChild);
+  for(var i=0;i<cats.length;i++){
+    (function(c){
+      var e = document.createElement("span");
+      e.className = "filter-tag";
+      e.textContent = c;
+      e.onclick = function(){ setC(c); };
+      bar.appendChild(e);
+    })(cats[i]);
+  }
+  render();
+}
+
+// Try cache first (instant), then fetch latest
+var cachedData = loadCache();
+if(cachedData){
+  initProducts(cachedData);
+  document.getElementById("total-count").textContent = cachedData.length + " 个产品";
+}
+// Always fetch latest in background (update cache if changed)
+fetch('products.json?_t='+Date.now())
   .then(function(r){ return r.json(); })
   .then(function(data){
-    // Convert flat array to 2D array by category
-    var catMap = {}, cats = [];
-    for(var i=0;i<data.length;i++){
-      var c = data[i].category;
-      if(!catMap[c]){ catMap[c]=[]; cats.push(c); }
-      catMap[c].push(data[i]);
+    if(!cachedData || JSON.stringify(cachedData) !== JSON.stringify(data)){
+      initProducts(data);
+      saveCache();
     }
-    ALL = [];
-    ALL_FLAT = data;
-    for(var i=0;i<cats.length;i++){
-      ALL.push(catMap[cats[i]]);
-    }
-    var bar = document.getElementById("cat-bar");
-    for(var i=0;i<cats.length;i++){
-      (function(c){
-        var e = document.createElement("span");
-        e.className = "filter-tag";
-        e.textContent = c;
-        e.onclick = function(){ setC(c); };
-        bar.appendChild(e);
-      })(cats[i]);
-    }
-    render();
   })
   .catch(function(e){
-    document.getElementById("container").innerHTML = '<div class="no-results"><div class="icon">❌</div><p>产品数据加载失败</p></div>';
+    if(!cachedData){
+      document.getElementById("container").innerHTML = '<div class="no-results"><div class="icon">❌</div><p>产品数据加载失败，请检查网络</p></div>';
+    }
+    // If cached data loaded successfully, silently ignore network error
   });
 
 // Update ALL_FLAT whenever ALL changes
@@ -275,6 +312,99 @@ function rebuildFlat(){
       ALL_FLAT.push(ALL[i][j]);
     }
   }
+}
+
+// ── Upload Excel to update products ──
+function uploadExcel(file){
+  if(!file){ showToast("请选择Excel文件","error"); return; }
+  if(!confirm("上传Excel将替换所有现有产品数据，确定继续？")) return;
+  showToast("⏳ 正在解析Excel...","success");
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      var data = new Uint8Array(e.target.result);
+      var wb = XLSX.read(data, {type:"array"});
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      var rows = XLSX.utils.sheet_to_json(ws, {header:1});
+      // Find header row
+      var hrow = -1;
+      for(var i=0;i<rows.length;i++){
+        var r = rows[i];
+        for(var j=0;j<r.length;j++){
+          if(r[j] && String(r[j]).indexOf("产品编号")>=0){ hrow = i; break; }
+        }
+        if(hrow>=0) break;
+      }
+      if(hrow<0){ showToast("❌ 未找到表头，请确认是潮兴报价表格式","error"); return; }
+      // Map columns
+      var colMap = {code:-1,color:-1,spec:-1,width:-1,weight:-1,comp:-1,price:-1};
+      var hdr = rows[hrow];
+      for(var j=0;j<hdr.length;j++){
+        var v = String(hdr[j]||"").replace(/[\n\s]/g,'');
+        if(v.indexOf("产品编号")>=0) colMap.code=j;
+        else if(v.indexOf("颜色")>=0) colMap.color=j;
+        else if(v.indexOf("规格")>=0) colMap.spec=j;
+        else if(v.indexOf("门幅")>=0) colMap.width=j;
+        else if(v.indexOf("克重")>=0) colMap.weight=j;
+        else if(v.indexOf("成份")>=0||v.indexOf("成分")>=0) colMap.comp=j;
+        else if(v.indexOf("价格")>=0||v.indexOf("单价")>=0) colMap.price=j;
+      }
+      if(colMap.code<0){ showToast("❌ 未找到「产品编号」列","error"); return; }
+      // Parse products by category
+      var cat = "";
+      var newALL = [];
+      for(var i=hrow+1;i<rows.length;i++){
+        var r = rows[i];
+        if(!r||r.length===0) continue;
+        var code = r[colMap.code];
+        if(!code||String(code).trim()==="") continue;
+        var cs = String(code).trim();
+        if(cs.indexOf("注：")===0||cs.indexOf("调整")===0||cs.indexOf("电话")>=0||cs.indexOf("手机")>=0) continue;
+        var specIdx = colMap.spec>=0?r[colMap.spec]:null;
+        if(!specIdx||String(specIdx).trim()===""){
+          if(cs.indexOf("门市部")<0&&cs.indexOf("安数")<0) cat = cs;
+          continue;
+        }
+        var color = colMap.color>=0?String(r[colMap.color]||"").trim():"";
+        var spec = colMap.spec>=0?String(r[colMap.spec]||"").trim():"";
+        var width = colMap.width>=0?String(r[colMap.width]||"").trim():"";
+        var weight = colMap.weight>=0?String(r[colMap.weight]||"").trim():"";
+        var comp = colMap.comp>=0?String(r[colMap.comp]||"").trim():"";
+        var price = colMap.price>=0?String(r[colMap.price]||"").trim():"";
+        // Auto stretch
+        var s = spec.toLowerCase(), c = comp.toLowerCase();
+        var stretch = "无弹";
+        if(s.indexOf("四面弹")>=0) stretch="四面弹";
+        else if(s.indexOf("高弹")>=0&&s.indexOf("中高弹")<0) stretch="高弹";
+        else if(s.indexOf("中弹")>=0||s.indexOf("中高弹")>=0) stretch="中弹";
+        else if(s.indexOf("棉弹")>=0) stretch="棉弹";
+        else if(s.indexOf("弹力")>=0||c.indexOf("氨纶")>=0) stretch="弹力";
+        else if(s.indexOf("微弹")>=0) stretch="微弹";
+        var prod = {code:cs, colors:color, spec:spec, width:width, weight:weight, composition:comp, price:price, category:cat, stretch:stretch, image:""};
+        var found=false;
+        for(var ai=0;ai<newALL.length;ai++){
+          if(newALL[ai].length>0 && newALL[ai][0].category===cat){
+            var dup=false;
+            for(var di=0;di<newALL[ai].length;di++){ if(newALL[ai][di].code===cs){ dup=true; break; } }
+            if(!dup) newALL[ai].push(prod);
+            found=true; break;
+          }
+        }
+        if(!found) newALL.push([prod]);
+      }
+      if(newALL.length===0){ showToast("❌ 未解析到任何产品","error"); return; }
+      ALL = newALL;
+      rebuildFlat();
+      saveCache();
+      render();
+      showToast("✅ 已导入 "+ALL_FLAT.length+" 个产品！点击「📤 发布更新」同步到网站","success");
+    } catch(err){
+      showToast("❌ 解析失败: "+err.message,"error");
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  // Reset input so same file can be re-uploaded
+  document.getElementById('excel-input').value = '';
 }
 
 // Find product in 2D ALL array, returns {catIdx, prodIdx}
@@ -475,6 +605,7 @@ function saveEdit(){
     reader.readAsDataURL(file);
   } else {
     hideEditPanel(); render();
+    saveCache();
     showToast("✅ 已保存（点击「📤 发布更新」同步到网站）","success");
   }
 }
@@ -483,7 +614,7 @@ function deleteProduct(){
   if(editingCatIdx<0 || editingProdIdx<0){ showToast("❌ 请先选择产品","error"); return; }
   if(!confirm("确定删除这产品？")) return;
   ALL[editingCatIdx].splice(editingProdIdx,1);
-  hideEditPanel(); render();
+  hideEditPanel(); render(); saveCache();
   showToast("✅ 已删除（点击「📤 发布更新」同步到网站）","success");
 }
 
@@ -530,7 +661,7 @@ function confirmAdd(){
       if(ALL[i].length>0 && ALL[i][0].category===prod.category){ ALL[i].push(prod); found=true; break; }
     }
     if(!found){ ALL.push([prod]); }
-    hideEditPanel(); rebuildFlat(); render();
+    hideEditPanel(); rebuildFlat(); saveCache(); render();
     showToast("✅ 已添加（点击「📤 发布更新」同步到网站）","success");
   }
   
