@@ -5,7 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preload" href="products.json" as="fetch" crossorigin="anonymous">
+<link rel="preload" href="sw.js" as="script">
 <title>潮兴纺织 - 产品查询</title>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,PingFang SC,Helvetica Neue,sans-serif;background:#f5f5f5;color:#333;min-height:100vh}
