@@ -5,7 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preload" href="products.json" as="fetch" crossorigin="anonymous">
+<link rel="preload" href="sw.js" as="script">
 <title>潮兴纺织 - 产品查询</title>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,PingFang SC,Helvetica Neue,sans-serif;background:#f5f5f5;color:#333;min-height:100vh}
@@ -133,6 +140,11 @@ body{font-family:-apple-system,PingFang SC,Helvetica Neue,sans-serif;background:
       <span class="filter-tag" data-s="高弹" onclick="setS('高弹')">🔝 高弹</span>
       <span class="filter-tag" data-s="四面弹" onclick="setS('四面弹')">↕ 四面弹</span>
     </div>
+    <div class="filter-label" style="margin-top:6px;">成份筛选</div>
+    <div class="filter-bar" id="material-bar">
+      <span class="filter-tag active" onclick="setM('')">全部</span>
+      <span class="filter-tag" onclick="setM('莱赛尔')" data-m="莱赛尔" style="background:rgba(156,39,176,.15)">🧵 莱赛尔系列</span>
+    </div>
     <div class="filter-label" style="margin-top:6px;">分类筛选</div>
     <div class="filter-bar" id="cat-bar">
       <span class="filter-tag active" onclick="setC(null)">全部分类</span>
@@ -230,7 +242,7 @@ body{font-family:-apple-system,PingFang SC,Helvetica Neue,sans-serif;background:
 <script>
 var ALL = [];           // 2D: ALL[catIdx][prodIdx]
 var ALL_FLAT = [];      // Flat array for fast lookup
-var selC = null, selS = "", searchText = "";
+var selC = null, selS = "", selM = "", searchText = "";
 var isAdmin = false;
 var ADMIN_PASSWORD = "cx888";
 var GITHUB_TOKEN = localStorage.getItem("gh_token") || "";
@@ -425,11 +437,20 @@ function render(){
   if(selS==="有弹") { var fs = []; for(var i=0;i<f.length;i++){ if(f[i].stretch!=="无弹") fs.push(f[i]); } f = fs; }
   else if(selS==="无弹") { var fs = []; for(var i=0;i<f.length;i++){ if(f[i].stretch==="无弹") fs.push(f[i]); } f = fs; }
   else if(selS) { var fs = []; for(var i=0;i<f.length;i++){ if(f[i].stretch===selS) fs.push(f[i]); } f = fs; }
+  if(selM==="莱赛尔") { var fm = []; for(var i=0;i<f.length;i++){ if(f[i].composition.indexOf("莱赛尔")>=0) fm.push(f[i]); } f = fm; }
   if(searchText) { var fs = []; var s = searchText;
+    // 同义词：超赛 ↔ 超柔赛络纺
+    var terms = [s];
+    if(s.indexOf("超赛")>=0) terms.push("超柔赛络纺");
+    if(s.indexOf("超柔赛络纺")>=0) terms.push("超赛");
     for(var i=0;i<f.length;i++){
       var p = f[i];
-      if(p.code.toLowerCase().indexOf(s)>=0 || p.colors.toLowerCase().indexOf(s)>=0 || p.composition.toLowerCase().indexOf(s)>=0 || p.spec.toLowerCase().indexOf(s)>=0)
-        fs.push(p);
+      for(var ti=0;ti<terms.length;ti++){
+        var t = terms[ti];
+        if(p.code.toLowerCase().indexOf(t)>=0 || p.colors.toLowerCase().indexOf(t)>=0 || p.composition.toLowerCase().indexOf(t)>=0 || p.spec.toLowerCase().indexOf(t)>=0){
+          fs.push(p); break;
+        }
+      }
     } f = fs;
   }
   document.getElementById("total-count").textContent = f.length + " 个产品";
@@ -466,6 +487,7 @@ function t(id){ var e=document.getElementById(id),a=document.getElementById("a"+
 function toggleFilter(){ var b=document.getElementById("filter-body"),a=document.getElementById("filter-arrow"); b.classList.toggle("collapsed"); a.classList.toggle("open"); }
 function setC(c){ selC=c; var ts=document.querySelectorAll("#cat-bar .filter-tag"); for(var i=0;i<ts.length;i++){ ts[i].classList.toggle("active",(i===0&&!c)||ts[i].textContent===c); } render(); }
 function setS(s){ selS=s; var ts=document.querySelectorAll("#stretch-bar .filter-tag"); for(var i=0;i<ts.length;i++){ ts[i].classList.toggle("active",ts[i].getAttribute("data-s")===s); } render(); }
+function setM(m){ selM=m; var ts=document.querySelectorAll("#material-bar .filter-tag"); for(var i=0;i<ts.length;i++){ ts[i].classList.toggle("active",(m===''&&i===0)||ts[i].getAttribute("data-m")===m); } render(); }
 
 // ── Login ──
 function showLogin(){ document.getElementById("login-overlay").classList.add("show"); setTimeout(function(){ document.getElementById("login-pwd").focus(); },100); }

@@ -6,10 +6,10 @@
     "width": "180",
     "weight": "327",
     "composition": "80棉 20聚酯纤维",
-    "price": "16.5",
+    "price": "17",
     "category": "棉布彩色系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "0_K2568-18.jpg"
   },
   {
     "code": "K2587-18#",
@@ -18,10 +18,10 @@
     "width": "180",
     "weight": "290",
     "composition": "82.9棉 17.1聚酯纤维",
-    "price": "17",
+    "price": "17.5",
     "category": "棉布彩色系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "1_K2587-18.jpg"
   },
   {
     "code": "K8719-19#蓝灰",
@@ -33,7 +33,7 @@
     "price": "21.5",
     "category": "筒子染、不掉色系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "2_K8719-19蓝灰.jpeg"
   },
   {
     "code": "K8719-19#咖啡",
@@ -45,7 +45,7 @@
     "price": "21.5",
     "category": "筒子染、不掉色系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "3_K8719-19咖啡.jpeg"
   },
   {
     "code": "K8719-19#艳兰",
@@ -57,7 +57,7 @@
     "price": "22",
     "category": "筒子染、不掉色系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "4_K8719-19艳兰.jpeg"
   },
   {
     "code": "M8829-18#蓝灰",
@@ -69,7 +69,7 @@
     "price": "21.5",
     "category": "筒子染、不掉色系列",
     "stretch": "弹力",
-    "image": ""
+    "image": "5_M8829-18蓝灰.jpeg"
   },
   {
     "code": "M8829-18#咖啡",
@@ -81,7 +81,7 @@
     "price": "21.5",
     "category": "筒子染、不掉色系列",
     "stretch": "弹力",
-    "image": ""
+    "image": "6_M8829-18咖啡.jpeg"
   },
   {
     "code": "K2528-18#青兰",
@@ -93,7 +93,7 @@
     "price": "22.5",
     "category": "筒子染、不掉色系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "7_K2528-18青兰.jpeg"
   },
   {
     "code": "M2529-18#青兰",
@@ -105,7 +105,7 @@
     "price": "21.5",
     "category": "筒子染、不掉色系列",
     "stretch": "弹力",
-    "image": ""
+    "image": "8_M2529-18青兰.jpeg"
   },
   {
     "code": "K2534-18#青兰",
@@ -117,7 +117,7 @@
     "price": "18.8",
     "category": "筒子染、不掉色系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "9_K2534-18青兰.jpeg"
   },
   {
     "code": "K2538-18#黑金",
@@ -129,7 +129,7 @@
     "price": "19",
     "category": "筒子染、不掉色系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "10_K2538-18黑金.jpeg"
   },
   {
     "code": "M2535-18#青兰",
@@ -141,7 +141,7 @@
     "price": "19",
     "category": "筒子染、不掉色系列",
     "stretch": "弹力",
-    "image": ""
+    "image": "11_M2535-18青兰.jpeg"
   },
   {
     "code": "M2539-18#黑金",
@@ -153,7 +153,7 @@
     "price": "19",
     "category": "筒子染、不掉色系列",
     "stretch": "弹力",
-    "image": ""
+    "image": "12_M2539-18黑金.jpeg"
   },
   {
     "code": "K2536-18#青兰",
@@ -165,7 +165,7 @@
     "price": "18.5",
     "category": "筒子染、不掉色系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "13_K2536-18青兰.jpeg"
   },
   {
     "code": "K2540-18#黑金",
@@ -189,7 +189,7 @@
     "price": "19.5",
     "category": "筒子染、不掉色系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "15_K2537-18青兰.jpeg"
   },
   {
     "code": "K2541-18#黑金",
@@ -355,78 +355,6 @@
     "weight": "335",
     "composition": "72棉 22涤纶 4粘胶 2氨纶",
     "price": "17.5",
-    "category": "筒子染、不掉色系列",
-    "stretch": "弹力",
-    "image": ""
-  },
-  {
-    "code": "F2200#兰",
-    "colors": "特深兰",
-    "spec": "8支竹节筒子染无弹",
-    "width": "170",
-    "weight": "359",
-    "composition": "全棉",
-    "price": "22",
-    "category": "筒子染、不掉色系列",
-    "stretch": "无弹",
-    "image": ""
-  },
-  {
-    "code": "F2110#兰、黑",
-    "colors": "特深兰、黑",
-    "spec": "8支竹节筒子染弹力",
-    "width": "158",
-    "weight": "322",
-    "composition": "83棉 15聚酯纤维 2氨纶",
-    "price": "22.5",
-    "category": "筒子染、不掉色系列",
-    "stretch": "弹力",
-    "image": ""
-  },
-  {
-    "code": "F2112#黑",
-    "colors": "黑面黑底",
-    "spec": "8支竹节筒子染弹力",
-    "width": "158",
-    "weight": "322",
-    "composition": "83棉 15聚酯纤维 2氨纶",
-    "price": "22.5",
-    "category": "筒子染、不掉色系列",
-    "stretch": "弹力",
-    "image": ""
-  },
-  {
-    "code": "F240-1#兰",
-    "colors": "特深兰",
-    "spec": "8支竹节TC筒子染",
-    "width": "170",
-    "weight": "342",
-    "composition": "83棉 15聚酯纤维 2氨纶",
-    "price": "22.5",
-    "category": "筒子染、不掉色系列",
-    "stretch": "弹力",
-    "image": ""
-  },
-  {
-    "code": "K3131#兰",
-    "colors": "特深兰",
-    "spec": "12支竹节筒子染无弹",
-    "width": "170",
-    "weight": "295",
-    "composition": "全棉",
-    "price": "20",
-    "category": "筒子染、不掉色系列",
-    "stretch": "无弹",
-    "image": ""
-  },
-  {
-    "code": "F241-1#兰",
-    "colors": "特深兰",
-    "spec": "12支竹节弹力筒子染",
-    "width": "170",
-    "weight": "258",
-    "composition": "83棉 15聚酯纤维 2氨纶",
-    "price": "20.5",
     "category": "筒子染、不掉色系列",
     "stretch": "弹力",
     "image": ""
@@ -774,7 +702,7 @@
     "width": "180",
     "weight": "470",
     "composition": "76.2棉 16.9聚酯纤维 6.9粘纤",
-    "price": "16.5",
+    "price": "17",
     "category": "5支、6支系列",
     "stretch": "无弹",
     "image": ""
@@ -969,7 +897,7 @@
     "price": "17.5",
     "category": "7支系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "74_6K688-19兰.jpg"
   },
   {
     "code": "7K717#兰、黑、兰灰",
@@ -1089,7 +1017,7 @@
     "price": "16.5",
     "category": "7支系列",
     "stretch": "无弹",
-    "image": ""
+    "image": "84_K2726-18兰黑.jpeg"
   },
   {
     "code": "K27262-18#黑面黑底",
@@ -1400,7 +1328,7 @@
     "composition": "85棉 14涤纶 1氨纶",
     "price": "16.5",
     "category": "7支系列",
-    "stretch": "弹力",
+    "stretch": "微弹",
     "image": ""
   },
   {
@@ -2577,7 +2505,7 @@
     "price": "15.5",
     "category": "10支系列",
     "stretch": "弹力",
-    "image": ""
+    "image": "206_M2566兰.jpg"
   },
   {
     "code": "M25662#黑面黑底",
@@ -2589,7 +2517,7 @@
     "price": "16",
     "category": "10支系列",
     "stretch": "弹力",
-    "image": ""
+    "image": "207_M25662黑面黑底.jpg"
   },
   {
     "code": "M2511#兰",
@@ -2864,7 +2792,7 @@
     "composition": "80棉 18粘纤 2氨纶",
     "price": "17",
     "category": "10支系列",
-    "stretch": "中弹",
+    "stretch": "高弹",
     "image": ""
   },
   {
@@ -2900,7 +2828,7 @@
     "composition": "69棉 27.5涤 2黏胶 1.5氨纶",
     "price": "17",
     "category": "10支系列",
-    "stretch": "中弹",
+    "stretch": "高弹",
     "image": ""
   },
   {
@@ -2912,7 +2840,7 @@
     "composition": "69棉 27.5涤 2黏胶 1.5氨纶",
     "price": "17",
     "category": "10支系列",
-    "stretch": "中弹",
+    "stretch": "高弹",
     "image": ""
   },
   {
@@ -3032,7 +2960,7 @@
     "composition": "80棉 18粘纤 2氨纶",
     "price": "16.5",
     "category": "10支系列",
-    "stretch": "弹力",
+    "stretch": "微弹",
     "image": ""
   },
   {
@@ -3114,7 +3042,7 @@
     "width": "180",
     "weight": "375",
     "composition": "69棉 30粘涤 1氨纶",
-    "price": "13",
+    "price": "13.5",
     "category": "10支系列",
     "stretch": "弹力",
     "image": ""
@@ -3500,7 +3428,7 @@
     "composition": "98棉 2氨纶",
     "price": "18",
     "category": "12支系列",
-    "stretch": "棉弹",
+    "stretch": "微弹",
     "image": ""
   },
   {
@@ -3620,7 +3548,7 @@
     "composition": "80棉 18粘纤 2氨纶",
     "price": "13",
     "category": "16支系列",
-    "stretch": "中弹",
+    "stretch": "高弹",
     "image": ""
   },
   {
@@ -3750,7 +3678,7 @@
     "width": "170",
     "weight": "328",
     "composition": "72棉 22涤纶 4黏胶 2氨纶",
-    "price": "16.5",
+    "price": "17",
     "category": "彩色系列",
     "stretch": "弹力",
     "image": ""
@@ -3762,7 +3690,7 @@
     "width": "180",
     "weight": "370",
     "composition": "85棉 15聚酯纤维",
-    "price": "17",
+    "price": "",
     "category": "彩色系列",
     "stretch": "无弹",
     "image": ""
@@ -3860,7 +3788,7 @@
     "composition": "57.6棉 24.4莱赛尔 10聚酯纤维 8粘纤",
     "price": "16",
     "category": "彩色系列",
-    "stretch": "无弹",
+    "stretch": "弹力",
     "image": ""
   },
   {
@@ -3993,6 +3921,78 @@
     "price": "19",
     "category": "彩色系列",
     "stretch": "棉弹",
+    "image": ""
+  },
+  {
+    "code": "F2200#兰",
+    "colors": "特深兰",
+    "spec": "8支竹节筒子染无弹",
+    "width": "170",
+    "weight": "359",
+    "composition": "全棉",
+    "price": "22",
+    "category": "筒子染、不掉色系列",
+    "stretch": "弹力",
+    "image": ""
+  },
+  {
+    "code": "F2110#兰、黑",
+    "colors": "特深兰、黑",
+    "spec": "8支竹节筒子染弹力",
+    "width": "158",
+    "weight": "322",
+    "composition": "83棉 15聚酯纤维 2氨纶",
+    "price": "22.5",
+    "category": "筒子染、不掉色系列",
+    "stretch": "弹力",
+    "image": ""
+  },
+  {
+    "code": "F2112#黑",
+    "colors": "黑面黑底",
+    "spec": "8支竹节筒子染弹力",
+    "width": "158",
+    "weight": "322",
+    "composition": "83棉 15聚酯纤维 2氨纶",
+    "price": "22.5",
+    "category": "筒子染、不掉色系列",
+    "stretch": "弹力",
+    "image": ""
+  },
+  {
+    "code": "F240-1#兰",
+    "colors": "特深兰",
+    "spec": "8支竹节TC筒子染",
+    "width": "170",
+    "weight": "342",
+    "composition": "83棉 15聚酯纤维 2氨纶",
+    "price": "22.5",
+    "category": "筒子染、不掉色系列",
+    "stretch": "弹力",
+    "image": ""
+  },
+  {
+    "code": "K3131#兰",
+    "colors": "特深兰",
+    "spec": "12支竹节筒子染无弹",
+    "width": "170",
+    "weight": "295",
+    "composition": "全棉",
+    "price": "20",
+    "category": "筒子染、不掉色系列",
+    "stretch": "弹力",
+    "image": ""
+  },
+  {
+    "code": "F241-1#兰",
+    "colors": "特深兰",
+    "spec": "12支竹节弹力筒子染",
+    "width": "170",
+    "weight": "258",
+    "composition": "83棉 15聚酯纤维 2氨纶",
+    "price": "20.5",
+    "category": "筒子染、不掉色系列",
+    "stretch": "弹力",
     "image": ""
   }
 ]
