@@ -466,7 +466,7 @@ function render(){
     for(var j=0;j<ps.length;j++){
       var p = ps[j];
       var st = p.stretch!=="无弹" ? '<span class="p-stretch yes">✅ '+p.stretch+'</span>' : '<span class="p-stretch no">无弹</span>';
-      var imgHtml = p.image ? '<div class="product-image-wrap"><img src="https://cdn.jsdelivr.net/gh/'+REPO_OWNER+'/'+REPO_NAME+'@main/products/'+p.image+'" alt="'+p.code+'" loading="lazy" onclick="openImageViewer(this.src)"></div>' : '';
+      var imgHtml = p.image ? '<div class="product-image-wrap"><img src="products/'+p.image+'" alt="'+p.code+'" loading="lazy" onclick="openImageViewer(this.src)"></div>' : '';
       var pr = (isAdmin && p.price) ? '<div class="p-price" style="margin-top:6px;font-size:15px;font-weight:700;color:#e74c3c;">¥'+p.price+'/米</div>' : '';
       var flatIdx = ALL_FLAT.indexOf(p);
       var editBtn = isAdmin ? '<button class="card-edit-btn" onclick="openEditByFlatIdx('+flatIdx+')">✏️</button>' : '';
