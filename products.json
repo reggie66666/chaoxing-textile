@@ -606,7 +606,7 @@
     "width": "190",
     "weight": "397",
     "composition": "100棉",
-    "price": "20",
+    "price": "20.5",
     "category": "纯棉系列",
     "stretch": "无弹",
     "image": ""
@@ -1038,7 +1038,7 @@
     "width": "190",
     "weight": "430",
     "composition": "80棉 20涤",
-    "price": "17",
+    "price": "17.5",
     "category": "7支系列",
     "stretch": "无弹",
     "image": ""
@@ -1050,7 +1050,7 @@
     "width": "190",
     "weight": "430",
     "composition": "80棉 20涤",
-    "price": "17.8",
+    "price": "18.3",
     "category": "7支系列",
     "stretch": "无弹",
     "image": ""
@@ -1063,6 +1063,18 @@
     "weight": "460",
     "composition": "70棉 30聚酯纤维",
     "price": "18.8",
+    "category": "7支系列",
+    "stretch": "无弹",
+    "image": ""
+  },
+  {
+    "code": "7K747-19#",
+    "colors": "特深兰、黑、蓝灰",
+    "spec": "7支OE超柔横竖竹牛仔",
+    "width": "190",
+    "weight": "430",
+    "composition": "76.2棉 16.9聚酯纤维 6.9粘纤",
+    "price": "16.5",
     "category": "7支系列",
     "stretch": "无弹",
     "image": ""
@@ -1482,7 +1494,7 @@
     "width": "190",
     "weight": "390",
     "composition": "90棉 10TC",
-    "price": "17",
+    "price": "17.5",
     "category": "8支系列",
     "stretch": "无弹",
     "image": ""
@@ -1494,7 +1506,7 @@
     "width": "190",
     "weight": "373",
     "composition": "90棉 10TC",
-    "price": "17",
+    "price": "17.5",
     "category": "8支系列",
     "stretch": "无弹",
     "image": ""
@@ -1506,7 +1518,7 @@
     "width": "190",
     "weight": "400",
     "composition": "88.3棉 9.2聚酯纤维 2.5再生纤维素纤维",
-    "price": "18",
+    "price": "18.5",
     "category": "8支系列",
     "stretch": "无弹",
     "image": ""
@@ -2340,6 +2352,18 @@
     "image": ""
   },
   {
+    "code": "K2677-19#兰",
+    "colors": "特深兰",
+    "spec": "10x7 OE超柔右斜",
+    "width": "190",
+    "weight": "370",
+    "composition": "83棉 17聚酯纤维",
+    "price": "13.8",
+    "category": "10支系列",
+    "stretch": "无弹",
+    "image": ""
+  },
+  {
     "code": "10K700#兰、黑、兰灰",
     "colors": "特深兰、黑、兰灰",
     "spec": "10x7 OE超柔左斜",
@@ -2611,6 +2635,30 @@
     "weight": "350",
     "composition": "74棉 22涤 3粘胶 1氨纶",
     "price": "17.5",
+    "category": "10支系列",
+    "stretch": "弹力",
+    "image": ""
+  },
+  {
+    "code": "T742-19#兰",
+    "colors": "特深兰",
+    "spec": "10+10x16/55 OE超柔TR",
+    "width": "190",
+    "weight": "340",
+    "composition": "72棉 22涤纶 4粘胶 2氨纶",
+    "price": "14.1",
+    "category": "10支系列",
+    "stretch": "弹力",
+    "image": ""
+  },
+  {
+    "code": "T742-19#黑面黑底",
+    "colors": "黑面黑底",
+    "spec": "10+10x16/55 OE超柔TR",
+    "width": "190",
+    "weight": "340",
+    "composition": "72棉 22涤纶 4粘胶 2氨纶",
+    "price": "14.3",
     "category": "10支系列",
     "stretch": "弹力",
     "image": ""
@@ -3666,7 +3714,7 @@
     "width": "180",
     "weight": "186",
     "composition": "全棉",
-    "price": "11.5",
+    "price": "11.8",
     "category": "21支系列",
     "stretch": "无弹",
     "image": ""
@@ -3994,16 +4042,5 @@
     "category": "彩色系列",
     "stretch": "棉弹",
     "image": ""
-  },
-  {
-    "code": "F3227",
-    "colors": "黑面黑底",
-    "spec": "10x7超柔右斜",
-    "width": "190",
-    "weight": "348",
-    "composition": "70%棉 30%涤纶",
-    "price": "",
-    "category": "",
-    "stretch": "无弹"
   }
 ]
