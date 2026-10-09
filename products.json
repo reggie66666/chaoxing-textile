@@ -1,5 +1,29 @@
 [
   {
+    "code": "B700-19#半漂",
+    "colors": "半漂",
+    "spec": "7支微弹 莱赛尔",
+    "width": "190",
+    "weight": "350",
+    "composition": "54棉 21莱赛尔 24聚酯纤维 1氨纶",
+    "price": "20",
+    "category": "白胚系列",
+    "stretch": "弹力",
+    "image": ""
+  },
+  {
+    "code": "B701-17#白胚",
+    "colors": "半漂",
+    "spec": "8+8x10/70+75TC 赛络纺 莱赛尔 四面弹",
+    "width": "170",
+    "weight": "380",
+    "composition": "43棉 17莱赛尔 33涤纶 5黏胶 2氨纶",
+    "price": "24",
+    "category": "白胚系列",
+    "stretch": "四面弹",
+    "image": ""
+  },
+  {
     "code": "K2568-18#",
     "colors": "粉色、卡布蓝、水泥灰、芬浅绿、克、厚巧卡、古典咖、茄皮紫、红棕、深土地、深勿绿、水藓绿、年代灰、暖纱色",
     "spec": "10x7色布",
@@ -295,6 +319,18 @@
     "weight": "330",
     "composition": "80棉 20聚酯纤维",
     "price": "16.5",
+    "category": "筒子染、不掉色系列",
+    "stretch": "无弹",
+    "image": ""
+  },
+  {
+    "code": "K2672-19#活性蓝",
+    "colors": "活性蓝",
+    "spec": "10+10x7 OE超柔牛仔",
+    "width": "190",
+    "weight": "380",
+    "composition": "80棉 20聚酯纤维",
+    "price": "17.5",
     "category": "筒子染、不掉色系列",
     "stretch": "无弹",
     "image": ""
@@ -966,7 +1002,7 @@
     "width": "190",
     "weight": "450",
     "composition": "75棉 25聚酯纤维",
-    "price": "17.5",
+    "price": "18.5",
     "category": "7支系列",
     "stretch": "无弹",
     "image": ""
@@ -2610,7 +2646,7 @@
     "width": "180",
     "weight": "397",
     "composition": "72棉 22涤纶 4粘胶 2氨纶",
-    "price": "16.3",
+    "price": "16.5",
     "category": "10支系列",
     "stretch": "弹力",
     "image": ""
@@ -3161,8 +3197,20 @@
     "spec": "10+10x16/55+12/70TR竹节OE超柔",
     "width": "180",
     "weight": "375",
-    "composition": "69棉 30粘涤 1氨纶",
+    "composition": "45.1棉 36.4聚酯纤维 17.3再生纤维 1.2氨纶",
     "price": "13",
+    "category": "10支系列",
+    "stretch": "弹力",
+    "image": ""
+  },
+  {
+    "code": "M3238-18#兰",
+    "colors": "特深兰",
+    "spec": "10+10x16/55+12/70TR竹节OE超柔",
+    "width": "180",
+    "weight": "375",
+    "composition": "69棉 30粘涤 1氨纶",
+    "price": "14.5",
     "category": "10支系列",
     "stretch": "弹力",
     "image": ""
@@ -3870,7 +3918,7 @@
     "width": "180",
     "weight": "408",
     "composition": "85棉 15聚酯纤维",
-    "price": "15",
+    "price": "16",
     "category": "彩色系列",
     "stretch": "无弹",
     "image": ""
@@ -4053,6 +4101,90 @@
     "price": "19",
     "category": "彩色系列",
     "stretch": "棉弹",
+    "image": ""
+  },
+  {
+    "code": "K2688#",
+    "colors": "半漂",
+    "spec": "8支竹节赛络纺右斜无弹",
+    "width": "170",
+    "weight": "330",
+    "composition": "100棉",
+    "price": "半漂21.5/米",
+    "category": "棉布系列",
+    "stretch": "无弹",
+    "image": ""
+  },
+  {
+    "code": "K26710#",
+    "colors": "半漂",
+    "spec": "7x10仿赛左斜无弹",
+    "width": "180",
+    "weight": "330",
+    "composition": "100棉",
+    "price": "半漂16.8/米",
+    "category": "棉布系列",
+    "stretch": "无弹",
+    "image": ""
+  },
+  {
+    "code": "K2677#",
+    "colors": "半漂",
+    "spec": "7x7赛络纺右斜无弹",
+    "width": "180",
+    "weight": "365",
+    "composition": "100棉",
+    "price": "21.3",
+    "category": "棉布系列",
+    "stretch": "无弹",
+    "image": ""
+  },
+  {
+    "code": "K2600#",
+    "colors": "半漂",
+    "spec": "10x10赛络纺右斜无弹",
+    "width": "180",
+    "weight": "270",
+    "composition": "100棉",
+    "price": "17.5",
+    "category": "棉布系列",
+    "stretch": "无弹",
+    "image": ""
+  },
+  {
+    "code": "K26755#",
+    "colors": "半漂",
+    "spec": "粗斜混纺右斜无弹",
+    "width": "170",
+    "weight": "320",
+    "composition": "68.3棉 31.7莱赛尔纤维",
+    "price": "19.8",
+    "category": "棉布系列",
+    "stretch": "无弹",
+    "image": ""
+  },
+  {
+    "code": "K26776#",
+    "colors": "半漂",
+    "spec": "7x6混纺赛络纺右斜无弹",
+    "width": "170",
+    "weight": "400",
+    "composition": "66.6棉 33.4莱赛尔纤维",
+    "price": "22.8",
+    "category": "棉布系列",
+    "stretch": "无弹",
+    "image": ""
+  },
+  {
+    "code": "M28668#",
+    "colors": "半漂",
+    "spec": "雪尼尔低弹",
+    "width": "145-148",
+    "weight": "425",
+    "composition": "68.2棉 26.8聚酯纤维 3.7粘纤 1.3氨纶",
+    "price": "半漂31/米",
+    "category": "棉布系列",
+    "stretch": "弹力",
     "image": ""
   }
 ]
