@@ -18,7 +18,7 @@
     "width": "170",
     "weight": "380",
     "composition": "43棉 17莱赛尔 33涤纶 5黏胶 2氨纶",
-    "price": "24.5",
+    "price": "24",
     "category": "白胚系列",
     "stretch": "四面弹",
     "image": ""
@@ -56,6 +56,18 @@
     "composition": "82.9棉 17.1聚酯纤维",
     "price": "17",
     "category": "棉布彩色系列",
+    "stretch": "无弹",
+    "image": ""
+  },
+  {
+    "code": "K8719-19#蓝",
+    "colors": "活性蓝",
+    "spec": "8+8x8超柔赛络纺不掉色",
+    "width": "190",
+    "weight": "335",
+    "composition": "64棉 24涤纶 12莱赛尔",
+    "price": "21.5",
+    "category": "筒子染、不掉色系列",
     "stretch": "无弹",
     "image": ""
   },
